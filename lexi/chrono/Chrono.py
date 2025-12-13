@@ -110,6 +110,13 @@ class Chrono:
                        )
                        """)
 
+        # After table creation
+        cursor.execute("PRAGMA table_info(file_records)")
+        columns = [row[1] for row in cursor.fetchall()]
+
+        if "file_id" not in columns:
+            cursor.execute("ALTER TABLE file_records ADD COLUMN file_id TEXT")
+
         # Create index
         cursor.execute("""
                        CREATE INDEX IF NOT EXISTS idx_file_path ON file_records(file_path)
@@ -117,6 +124,13 @@ class Chrono:
 
         self.conn.commit()
         self.logger.debug(f"Database initialized at {db_location}")
+
+    def _generate_file_id(self, file_path: str) -> str:
+        try:
+            stat = os.stat(file_path)
+            return f"{stat.st_ino}-{stat.st_dev}"
+        except Exception:
+            return file_path  # fallback (safe)
 
     def _compute_hash(self, file_path: str) -> Optional[str]:
         """Compute SHA-256 hash of file contents."""
@@ -144,9 +158,9 @@ class Chrono:
                 'file_type': os.path.splitext(file_path)[1].lower(),
                 'file_size_kb': size_kb,
                 'last_modified': last_modified,
-                'content_hash': None
+                'content_hash': None,
+                "file_id": self._generate_file_id(file_path),
             }
-
             if self.use_hash_for_changes:
                 metadata['content_hash'] = self._compute_hash(file_path)
 
@@ -155,6 +169,39 @@ class Chrono:
         except (IOError, OSError, PermissionError) as e:
             self.logger.warning(f"Cannot access file {file_path}: {e}")
             return None
+
+    def status(self) -> Dict[str, Any]:
+        """
+        Return current Chrono status and resource usage.
+        """
+
+        # Directories tracked
+        tracked_dirs = self.scan_dirs
+
+        # DB size
+        if self.in_memory:
+            db_size = "in-memory"
+        else:
+            try:
+                db_size = os.path.getsize(self.db_path)
+            except OSError:
+                db_size = 0
+
+        # Process memory
+        try:
+            process = psutil.Process(os.getpid())
+            memory_bytes = process.memory_info().rss
+        except Exception:
+            memory_bytes = sys.getsizeof(self.__dict__)
+
+        return {
+            "tracked_directories": tracked_dirs,
+            "database_path": self.db_path,
+            "database_size_bytes": db_size,
+            "process_memory_bytes": memory_bytes,
+            "use_hash_for_changes": self.use_hash_for_changes,
+            "in_memory": self.in_memory
+        }
 
     def _load_existing_records(self) -> Dict[str, Dict[str, Any]]:
         """Load existing file records from database."""
