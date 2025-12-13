@@ -1,5 +1,5 @@
 from lexi.handlers.base import LexiHandler
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 class RecursiveChunkerHandler(LexiHandler):
@@ -21,7 +21,7 @@ class RecursiveChunkerHandler(LexiHandler):
         context["chunks"] = chunks
 
 from lexi.handlers.base import LexiHandler
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 import numpy as np
 
 

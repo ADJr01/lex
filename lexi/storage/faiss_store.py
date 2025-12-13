@@ -1,5 +1,5 @@
 import faiss
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 
 class PersistentFaissMixin:
 

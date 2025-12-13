@@ -1,4 +1,5 @@
 import os
+import sys
 import sqlite3
 import hashlib
 import logging
@@ -100,22 +101,34 @@ class Chrono:
 
         # Create table
         cursor.execute("""
-                       CREATE TABLE IF NOT EXISTS file_records (
-                           file_path TEXT PRIMARY KEY,
-                           file_name TEXT NOT NULL,
-                           file_type TEXT NOT NULL,
-                           file_size_kb INTEGER NOT NULL,
-                           last_modified REAL NOT NULL,
-                           content_hash TEXT
+                       CREATE TABLE IF NOT EXISTS file_records
+                       (
+                           file_path
+                           TEXT
+                           PRIMARY
+                           KEY,
+                           file_name
+                           TEXT
+                           NOT
+                           NULL,
+                           file_type
+                           TEXT
+                           NOT
+                           NULL,
+                           file_size_kb
+                           INTEGER
+                           NOT
+                           NULL,
+                           last_modified
+                           REAL
+                           NOT
+                           NULL,
+                           content_hash
+                           TEXT,
+                           file_id
+                           TEXT
                        )
                        """)
-
-        # After table creation
-        cursor.execute("PRAGMA table_info(file_records)")
-        columns = [row[1] for row in cursor.fetchall()]
-
-        if "file_id" not in columns:
-            cursor.execute("ALTER TABLE file_records ADD COLUMN file_id TEXT")
 
         # Create index
         cursor.execute("""
@@ -126,11 +139,12 @@ class Chrono:
         self.logger.debug(f"Database initialized at {db_location}")
 
     def _generate_file_id(self, file_path: str) -> str:
+        """Generate unique file ID based on inode and device."""
         try:
             stat = os.stat(file_path)
             return f"{stat.st_ino}-{stat.st_dev}"
         except Exception:
-            return file_path  # fallback (safe)
+            return hashlib.md5(file_path.encode()).hexdigest()  # fallback
 
     def _compute_hash(self, file_path: str) -> Optional[str]:
         """Compute SHA-256 hash of file contents."""
@@ -159,8 +173,9 @@ class Chrono:
                 'file_size_kb': size_kb,
                 'last_modified': last_modified,
                 'content_hash': None,
-                "file_id": self._generate_file_id(file_path),
+                'file_id': self._generate_file_id(file_path),
             }
+
             if self.use_hash_for_changes:
                 metadata['content_hash'] = self._compute_hash(file_path)
 
@@ -174,7 +189,6 @@ class Chrono:
         """
         Return current Chrono status and resource usage.
         """
-
         # Directories tracked
         tracked_dirs = self.scan_dirs
 
@@ -187,11 +201,12 @@ class Chrono:
             except OSError:
                 db_size = 0
 
-        # Process memory
+        # Process memory (try psutil, fallback to sys.getsizeof)
         try:
+            import psutil
             process = psutil.Process(os.getpid())
             memory_bytes = process.memory_info().rss
-        except Exception:
+        except (ImportError, Exception):
             memory_bytes = sys.getsizeof(self.__dict__)
 
         return {
@@ -372,10 +387,11 @@ class Chrono:
                 if new_files:
                     cursor.executemany("""
                                        INSERT INTO file_records
-                                       (file_path, file_name, file_type, file_size_kb, last_modified, content_hash)
-                                       VALUES (?, ?, ?, ?, ?, ?)
+                                       (file_path, file_name, file_type, file_size_kb, last_modified, content_hash,
+                                        file_id)
+                                       VALUES (?, ?, ?, ?, ?, ?, ?)
                                        """, [(f['file_path'], f['file_name'], f['file_type'],
-                                              f['file_size_kb'], f['last_modified'], f['content_hash'])
+                                              f['file_size_kb'], f['last_modified'], f['content_hash'], f['file_id'])
                                              for f in new_files])
                     self.logger.info(f"Inserted {len(new_files)} new records")
 
@@ -387,10 +403,11 @@ class Chrono:
                                            file_type     = ?,
                                            file_size_kb  = ?,
                                            last_modified = ?,
-                                           content_hash  = ?
+                                           content_hash  = ?,
+                                           file_id       = ?
                                        WHERE file_path = ?
                                        """, [(f['file_name'], f['file_type'], f['file_size_kb'],
-                                              f['last_modified'], f['content_hash'], f['file_path'])
+                                              f['last_modified'], f['content_hash'], f['file_id'], f['file_path'])
                                              for f in changed_files])
                     self.logger.info(f"Updated {len(changed_files)} records")
 
@@ -468,7 +485,7 @@ class Chrono:
 
     def close(self) -> None:
         """Close database connection."""
-        if hasattr(self, 'conn'):
+        if hasattr(self, 'conn') and self.conn:
             self.conn.close()
             self.logger.info("Database connection closed")
 
@@ -481,34 +498,10 @@ class Chrono:
         self.close()
         return False
 
-
-# Example usage
-if __name__ == "__main__":
-    config = {
-        'supported_file_types': ['.txt', '.pdf', '.jpg', '.png', '.docx'],
-        'db_path': '/tmp/chrono.db',
-        'scan_dirs': ['/tmp/test_dir'],
-        'in_memory': False,
-        'use_hash_for_changes': False
-    }
-
-    with Chrono(config) as chrono:
-        # Scan for changes
-        changes = chrono.scan()
-
-        # Display changes
-        for change in changes:
-            status_name = {0: 'NEW', 1: 'CHANGED', 2: 'DELETED'}.get(change['status'], 'UNKNOWN')
-            print(f"[{status_name}] {change['file_name']} ({change['file_type']}) - {change['file_size_kb']} KB")
-
-        # Commit changes to database
-        chrono.commit()
-
-        # Query records from a specific directory
-        records = chrono.query_records('/tmp/test_dir')
-        print(f"\nTotal records in /tmp/test_dir: {len(records)}")
-
-        # Query all records
-        all_records = chrono.query_records()
-        print(f"Total records in database: {len(all_records)}")
-
+    def __del__(self):
+        """Destructor to ensure connection is closed."""
+        try:
+            if hasattr(self, 'conn') and self.conn:
+                self.conn.close()
+        except Exception:
+            pass  # Silently ignore errors during cleanup

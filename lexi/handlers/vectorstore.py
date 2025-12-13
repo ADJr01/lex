@@ -1,6 +1,6 @@
 from lexi.handlers.base import LexiHandler
-from langchain.vectorstores import FAISS
-
+from langchain_community.vectorstores import FAISS
+from lexi.storage.metadata_store import MetadataStore
 
 class FaissNanoHandler(LexiHandler):
 

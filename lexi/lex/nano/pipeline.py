@@ -5,12 +5,17 @@ from lexi.handlers.chunker import RecursiveChunkerHandler
 from lexi.handlers.embedder import EmbedderHandler
 from lexi.handlers.vectorstore import FaissNanoHandler
 from lexi.storage.faiss_store import FaissStore
-
-
+from lexi.storage.metadata_store import MetadataStore
+import os
 class LexiNanoPipeline(LexBase):
 
     def __init__(self, config):
         self.embedding = config.embedding
+        self.index_path = os.path.join("lexi_index", "nano")
+        os.makedirs(self.index_path, exist_ok=True)
+        self.metastore = MetadataStore(
+            db_path=os.path.join(self.index_path, "metadata.db")
+        )
         self.faiss_store = FaissStore(self.embedding)
         self._build_chain()
 
@@ -19,7 +24,7 @@ class LexiNanoPipeline(LexBase):
         self.cleaner = BasicCleanerHandler()
         self.chunker = RecursiveChunkerHandler()
         self.embedder = EmbedderHandler(self.embedding)
-        self.vector = FaissNanoHandler(self.faiss_store)
+        self.vector = FaissNanoHandler(self.faiss_store,self.metastore)
 
         self.loader \
             .set_next(self.cleaner) \
@@ -38,3 +43,21 @@ class LexiNanoPipeline(LexBase):
 
     def search(self, query: str, **kwargs):
         return self.faiss_store.similarity_search(query, k=kwargs.get("k", 5))
+
+    def persist(self):
+        """
+        Persist FAISS index and metadata.
+        """
+        if hasattr(self.faiss_store, "save"):
+            self.faiss_store.save(self.index_path)
+
+    def load(self):
+        """
+        Load FAISS index if it exists.
+        """
+        try:
+            if hasattr(self.faiss_store, "load"):
+                self.faiss_store.load(self.index_path)
+        except Exception:
+            # First run – nothing to load
+            pass

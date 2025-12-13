@@ -1,5 +1,5 @@
 from typing import List, Optional
-from Chrono import Chrono
+from lexi.chrono import Chrono
 
 
 class ChronoAdapter:
@@ -41,6 +41,12 @@ class ChronoAdapter:
     def query_records(self, directory: Optional[str] = None) -> List[dict]:
         self._ensure_initialized()
         return self._chrono.query_records(directory)
+
+    def close(self) -> None:
+        if self._chrono:
+            self._chrono.close()
+            self._chrono = None
+        return False  # do not suppress exceptions
 
     # -------------------------
     # Internal helpers
