@@ -5,16 +5,16 @@ def get_ollama_embeddong():
 
 def main():
     lexi_config = {
-        'mode': 'LEXI_NANO',
+        'mode': 'LEXI_LDS',
         'embedding': get_ollama_embeddong(),
         'sync_dirs':['D:\\Training\\test'],
-        "in_memory":True,
+        "in_memory":False,
         'use_hash_for_changes':True,
 
     }
     lex = LexiController(lexi_config)
     lex.sync()
-    result = lex.search(query="array in js",kwargs=1)
+    result = lex.search(query="how to influence a friend",kwargs=1)
     print(lex.stats())
     print(result)
     lex.shutdown()
@@ -24,4 +24,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+

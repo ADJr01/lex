@@ -1,4 +1,6 @@
+import os
 import faiss
+from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 
 class PersistentFaissMixin:
@@ -12,8 +14,19 @@ class PersistentFaissMixin:
 
 class FaissStore:
     def __init__(self, embedding):
-        index = faiss.IndexFlatL2(embedding.embed_query("test").__len__())
-        self.store = FAISS(embedding, index, {}, [])
+        dim = len(embedding.embed_query("test"))
+
+        index = faiss.IndexFlatL2(dim)
+
+        docstore = InMemoryDocstore({})
+        index_to_docstore_id = {}
+
+        self.store = FAISS(
+            embedding_function=embedding,
+            index=index,
+            docstore=docstore,
+            index_to_docstore_id=index_to_docstore_id,
+        )
 
     def add_documents(self, docs):
         self.store.add_documents(docs)
@@ -23,15 +36,26 @@ class FaissStore:
 
     def similarity_search(self, query, k=5):
         return self.store.similarity_search(query, k)
+
+    def save(self, path: str):
+        self.store.save_local(path)
+
+    def load(self, path: str):
+        self.store = FAISS.load_local(
+            path,
+            self.store.embedding_function,
+            allow_dangerous_deserialization=True,
+        )
 
 
 class FaissHNSWStore:
     def __init__(self, embedding, dim):
+        docstore = InMemoryDocstore({})
         index = faiss.IndexHNSWFlat(dim, 32)
         index.hnsw.efSearch = 64
         index.hnsw.efConstruction = 200
-
-        self.store = FAISS(embedding, index, {}, [])
+        index_to_docstore_id = {}
+        self.store = FAISS(embedding, index, docstore, index_to_docstore_id)
 
     def add_documents(self, docs):
         self.store.add_documents(docs)
@@ -41,3 +65,15 @@ class FaissHNSWStore:
 
     def similarity_search(self, query, k=5):
         return self.store.similarity_search(query, k)
+
+    def save(self, path: str):
+        self.store.save_local(path)
+
+    def load(self, path: str):
+        self.store = FAISS.load_local(
+            path,
+            self.store.embedding_function,
+            allow_dangerous_deserialization=True,
+        )
+
+

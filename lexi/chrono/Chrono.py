@@ -61,6 +61,8 @@ class Chrono:
         for key in required_keys:
             if key not in config:
                 raise ValueError(f"Missing required config key: '{key}'")
+            if config[key] is None:
+                raise ValueError(f"Config key '{key}' cannot be None")
 
         if not config['supported_file_types']:
             raise ValueError("supported_file_types cannot be empty")
@@ -71,6 +73,10 @@ class Chrono:
         for ext in config['supported_file_types']:
             if not isinstance(ext, str) or not ext.startswith('.'):
                 raise ValueError(f"Invalid file extension: '{ext}'. Must start with '.'")
+
+        # Validate db_path
+        if not isinstance(config['db_path'], str):
+            raise ValueError(f"db_path must be a string, got {type(config['db_path'])}")
 
         if not config['scan_dirs']:
             raise ValueError("scan_dirs cannot be empty")
@@ -90,9 +96,11 @@ class Chrono:
         """Initialize SQLite database and create schema."""
         db_location = ':memory:' if self.in_memory else self.db_path
 
-        # Create parent directory if needed
-        if not self.in_memory:
-            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        # Create parent directory if needed (only for file-based DB)
+        if not self.in_memory and self.db_path:
+            db_dir = os.path.dirname(self.db_path)
+            if db_dir:  # Only create if there's a directory component
+                os.makedirs(db_dir, exist_ok=True)
 
         self.conn = sqlite3.connect(db_location, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
@@ -489,15 +497,6 @@ class Chrono:
             self.conn.close()
             self.logger.info("Database connection closed")
 
-    def __enter__(self):
-        """Context manager entry."""
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """Context manager exit."""
-        self.close()
-        return False
-
     def __del__(self):
         """Destructor to ensure connection is closed."""
         try:
@@ -505,3 +504,8 @@ class Chrono:
                 self.conn.close()
         except Exception:
             pass  # Silently ignore errors during cleanup
+
+
+
+
+

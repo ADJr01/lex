@@ -31,6 +31,13 @@ class FaissNanoHandler(LexiHandler):
             )
 
             chunk.metadata["chunk_id"] = cid
+            REQUIRED_FIELDS = ("file_path", "directory", "content_type", "chunk_index")
+            for field in REQUIRED_FIELDS:
+                if field not in chunk.metadata:
+                    raise ValueError(
+                        f"Missing required metadata field '{field}' "
+                        f"for chunk from {chunk.metadata.get('file_path')}"
+                    )
             self.metastore.add_chunk(cid, chunk.metadata)
 
         self.store.add_documents(context["chunks"])

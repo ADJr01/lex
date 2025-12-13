@@ -45,3 +45,24 @@ class LexiLDSPipeline(LexBase):
 
     def search(self, query: str, **kwargs):
         return self.faiss_store.similarity_search(query, k=kwargs.get("k", 10))
+
+
+
+    def persist(self):
+        """
+        Persist FAISS index and metadata to disk.
+        """
+        if hasattr(self.faiss_store, "save"):
+            self.faiss_store.save(self.index_path)
+        # MetadataStore uses SQLite → already persisted
+
+    def load(self):
+        """
+        Load FAISS index from disk if it exists.
+        """
+        try:
+            if hasattr(self.faiss_store, "load"):
+                self.faiss_store.load(self.index_path)
+        except Exception:
+            # First run or index not present
+            pass

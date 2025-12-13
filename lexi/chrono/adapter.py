@@ -1,5 +1,5 @@
+from lexi.chrono.Chrono import Chrono
 from typing import List, Optional
-from lexi.chrono import Chrono
 
 
 class ChronoAdapter:
@@ -10,25 +10,9 @@ class ChronoAdapter:
 
     def __init__(self, chrono_config: dict):
         self.chrono_config = chrono_config
-        self._chrono: Optional[Chrono] = None
+        self._chrono: Optional[Chrono] = Chrono(self.chrono_config)
 
-    # -------------------------
-    # Lifecycle management
-    # -------------------------
 
-    def __enter__(self):
-        self._chrono = Chrono(self.chrono_config)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self._chrono:
-            self._chrono.close()
-            self._chrono = None
-        return False  # do not suppress exceptions
-
-    # -------------------------
-    # Chrono operations
-    # -------------------------
 
     def scan(self) -> List[dict]:
         self._ensure_initialized()

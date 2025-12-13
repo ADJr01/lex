@@ -64,23 +64,23 @@ class LexiController:
         ]
 
     def sync(self):
-        with self.chrono as chrono:
-            changes = chrono.scan()
+        changes = self.chrono.scan()
+        for record in changes:
+            status = record["status"]
 
-            for record in changes:
-                status = record["status"]
+            if status == FileStatus.NEW:
+                self.lex.ingest(record)
 
-                if status == FileStatus.NEW:
-                    self.lex.ingest(record)
+            elif status == FileStatus.CHANGED:
+                self.lex.delete(record["file_path"])
+                self.lex.ingest(record)
 
-                elif status == FileStatus.CHANGED:
-                    self.lex.delete(record["file_path"])
-                    self.lex.ingest(record)
+            elif status == FileStatus.DELETED:
+                self.lex.delete(record["file_path"])
 
-                elif status == FileStatus.DELETED:
-                    self.lex.delete(record["file_path"])
+        self.chrono.commit()
 
-            chrono.commit()
+
 
     def stats(self):
         return {
