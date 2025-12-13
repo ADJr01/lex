@@ -1,7 +1,7 @@
 from lexi.handlers.base import LexiHandler
-from langchain.document_loaders import TextLoader, PyPDFLoader, UnstructuredWordDocumentLoader, JSONLoader
+from langchain_community.document_loaders import TextLoader, PyPDFLoader, UnstructuredWordDocumentLoader, JSONLoader
 
-from langchain.document_loaders import (
+from langchain_community.document_loaders import (
     TextLoader,
     PyPDFLoader,
     UnstructuredWordDocumentLoader,
