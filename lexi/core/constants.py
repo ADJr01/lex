@@ -7,7 +7,9 @@ class LexiMode(str, Enum):
 
 
 class FileStatus:
-    NEW = 0
-    CHANGED = 1
-    UNCHANGED = -1
-    DELETED = 2
+    STATUS_NEW = 0
+    STATUS_CHANGED = 1
+    STATUS_DELETED = 2
+    STATUS_UNCHANGED = -1
+    STATUS_SYNCED = 3
+    STATUS_ERROR = 4

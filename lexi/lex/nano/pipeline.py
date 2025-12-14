@@ -11,7 +11,8 @@ class LexiNanoPipeline(LexBase):
 
     def __init__(self, config):
         self.embedding = config.embedding
-        self.index_path = os.path.join("lexi_index", "nano")
+        base_dir = os.path.dirname(config.db_path)
+        self.index_path = os.path.join(base_dir, "lexi_index", "nano")
         os.makedirs(self.index_path, exist_ok=True)
         self.metastore = MetadataStore(
             db_path=os.path.join(self.index_path, "metadata.db")

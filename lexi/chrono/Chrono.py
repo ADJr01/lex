@@ -7,6 +7,8 @@ from threading import Lock
 from pathlib import Path
 from typing import List, Dict, Optional, Any
 
+from lexi.core.constants import FileStatus
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
@@ -378,6 +380,8 @@ class Chrono:
                          f"Changed: {summary[self.STATUS_CHANGED]}, "
                          f"Deleted: {summary[self.STATUS_DELETED]}")
 
+
+
     def commit(self) -> None:
         """
         Commit scanned changes to database.
@@ -461,6 +465,53 @@ class Chrono:
                 self.logger.error(f"Unexpected error during commit: {e}")
                 self.conn.rollback()
                 raise
+    def get_active_records(self):
+        """
+        Return all file records that are NEW or CHANGED.
+        """
+        cursor = self.conn.execute(
+            "SELECT rowid, path, status FROM file_records WHERE status IN (?, ?)",
+            (FileStatus.STATUS_NEW, FileStatus.STATUS_CHANGED)
+        )
+        return [dict(zip([c[0] for c in cursor.description], row)) for row in cursor.fetchall()]
+
+    def update_status(self, record_id: int, new_status: int):
+        """
+        Update the sync status of a file record in ChronoDB.
+        Used by Lexi to mark records as SYNCED or ERROR.
+        """
+        with self._lock:
+            try:
+                self.conn.execute(
+                    "UPDATE file_records SET status=? WHERE rowid=?",
+                    (new_status, record_id)
+                )
+            except Exception as e:
+                print(f"[Chrono] Failed to update status for record {record_id}: {e}")
+
+    def mark_synced(self, file_path: str):
+        """
+        Mark a file as successfully processed (SYNCED) by its path.
+        """
+        with self._lock:
+            try:
+                self.conn.execute(
+                    "UPDATE file_records SET status=? WHERE path=?",
+                    (FileStatus.STATUS_SYNCED, file_path)
+                )
+            except Exception as e:
+                print(f"[Chrono] Failed to mark {file_path} as synced: {e}")
+
+    def remove_record(self, record_id: int):
+        """
+        Permanently remove a record from ChronoDB.
+        Used when Lexi confirms a file has been deleted and vectors removed.
+        """
+        with self._lock:
+            try:
+                self.conn.execute("DELETE FROM file_records WHERE rowid=?", (record_id,))
+            except Exception as e:
+                print(f"[Chrono] Failed to delete record {record_id}: {e}")
 
     def query_records(self, directory: Optional[str] = None) -> List[Dict[str, Any]]:
         """
