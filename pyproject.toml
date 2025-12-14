@@ -26,9 +26,11 @@ dependencies = [
     "python-docx>=1.1.0",
     "python-dotenv>=1.0.0",
     "rich>=13.7.0",
+    "semantic-chunker-langchain>=0.1.4",
     "sqlalchemy>=2.0.0",
     "sqlite-utils>=3.36",
     "tiktoken>=0.6.0",
     "tqdm>=4.65.0",
     "unstructured[docx,pdf,xlsx]>=0.12.4",
+    "watchdog>=6.0.0",
 ]

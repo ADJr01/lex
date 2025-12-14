@@ -12,7 +12,7 @@ tqdm>=4.65.0
 langchain>=0.1.16
 langchain-community>=0.0.34
 langchain-core>=0.1.43
-
+semantic-chunker-langchain
 # -------------------------------
 # Embeddings Providers
 # (Choose what you need)
@@ -77,3 +77,8 @@ rich>=13.7.0
 # -------------------------------
 pytest>=8.0.0
 pytest-cov>=4.1.0
+
+#-----------------
+# watchdog
+#-----------------
+watchdog
