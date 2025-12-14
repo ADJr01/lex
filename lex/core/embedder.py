@@ -72,7 +72,8 @@ class Embedder:
                     continue
                 embedded.append({
                     "vector": vector,
-                    "meta": batch[j]["meta"]
+                    "meta": batch[j]["meta"],
+                    "text": batch[j]["text"]
                 })
 
         print(f"[Embedder] Completed embeddings for {len(embedded)} chunks.")
