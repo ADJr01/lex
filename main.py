@@ -13,7 +13,7 @@ if __name__ == "__main__":
                  .set_storage_dir("D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage")
                  .set_record_path("D:\\Projects\\Personal\\LLM\\Lexi\\test\\record")
                  .set_chunking_strategy(InstanceConfig.CHUNK_MECHANISM.SEMANTIC_CHUNK)
-                 .set_mode({'mode':InstanceConfig.MODES.LEX_LDS,'response_mode':InstanceConfig.RESPONSE_MODES.DEEP}))
+                 .set_mode({'mode':InstanceConfig.MODES.LEX_NANO,'response_mode':InstanceConfig.RESPONSE_MODES.DEEP}))
     lexi = Lex(lexi_conf).start()
     print(lexi.is_running)
     query_api = lexi.vector_store_api()
