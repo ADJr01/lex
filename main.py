@@ -8,6 +8,7 @@ def main():
         'mode': 'LEXI_LDS',
         'embedding': get_ollama_embeddong(),
         'sync_dirs':['D:\\Training\\test'],
+        'db_path':'D:\\chrono\\chrono.db',
         "in_memory":False,
         'use_hash_for_changes':True,
 

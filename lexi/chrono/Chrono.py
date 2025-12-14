@@ -78,6 +78,16 @@ class Chrono:
         if not isinstance(config['db_path'], str):
             raise ValueError(f"db_path must be a string, got {type(config['db_path'])}")
 
+        # Check if db_path is a directory (common mistake)
+        if config['db_path'].endswith(os.sep) or config['db_path'].endswith('/') or config['db_path'].endswith('\\'):
+            raise ValueError(f"db_path must be a file path, not a directory: '{config['db_path']}'. "
+                             f"Example: 'D:/chrono/chrono.db' not 'D:/chrono/'")
+
+        # Check if db_path has a file extension
+        if '.' not in os.path.basename(config['db_path']):
+            raise ValueError(f"db_path should include a file name with extension: '{config['db_path']}'. "
+                             f"Example: '{config['db_path']}/chrono.db'")
+
         if not config['scan_dirs']:
             raise ValueError("scan_dirs cannot be empty")
 
@@ -98,12 +108,20 @@ class Chrono:
 
         # Create parent directory if needed (only for file-based DB)
         if not self.in_memory and self.db_path:
-            db_dir = os.path.dirname(self.db_path)
-            if db_dir:  # Only create if there's a directory component
-                os.makedirs(db_dir, exist_ok=True)
+            db_dir = os.path.dirname(os.path.abspath(self.db_path))
+            if db_dir and not os.path.exists(db_dir):
+                try:
+                    os.makedirs(db_dir, exist_ok=True)
+                    self.logger.info(f"Created database directory: {db_dir}")
+                except OSError as e:
+                    raise ValueError(f"Cannot create database directory '{db_dir}': {e}")
 
-        self.conn = sqlite3.connect(db_location, check_same_thread=False)
-        self.conn.row_factory = sqlite3.Row
+        try:
+            self.conn = sqlite3.connect(db_location, check_same_thread=False)
+            self.conn.row_factory = sqlite3.Row
+        except sqlite3.OperationalError as e:
+            raise ValueError(f"Cannot open database at '{db_location}': {e}. "
+                             f"Ensure the directory exists and you have write permissions.")
 
         cursor = self.conn.cursor()
 
@@ -504,8 +522,5 @@ class Chrono:
                 self.conn.close()
         except Exception:
             pass  # Silently ignore errors during cleanup
-
-
-
 
 
