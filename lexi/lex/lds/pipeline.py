@@ -56,6 +56,9 @@ class LexiLDSPipeline(LexBase):
             self.faiss_store.save(self.index_path)
         # MetadataStore uses SQLite → already persisted
 
+    def delete(self, file_path: str):
+        self.faiss_store.delete(where={"file_path": file_path})
+
     def load(self):
         """
         Load FAISS index from disk if it exists.

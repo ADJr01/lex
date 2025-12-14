@@ -80,6 +80,14 @@ class LexiController:
 
         self.chrono.commit()
 
+        # 5️⃣ Save FAISS index to disk if configured
+        if not getattr(self.config, "faiss_in_memory", False):
+            try:
+                self.lex.persist()
+                print("[Lexi] FAISS index persisted to disk.")
+            except Exception as e:
+                print(f"[Lexi] Warning: failed to persist FAISS index → {e}")
+
 
 
     def stats(self):

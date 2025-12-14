@@ -5,11 +5,11 @@ def get_ollama_embeddong():
 
 def main():
     lexi_config = {
-        'mode': 'LEXI_LDS',
+        'mode': 'LEXI_NANO',
         'embedding': get_ollama_embeddong(),
         'sync_dirs':['D:\\Training\\test'],
         'db_path':'D:\\chrono\\chrono.db',
-        "in_memory":False,
+        "in_memory":True,
         'use_hash_for_changes':True,
 
     }
