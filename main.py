@@ -1,34 +1,26 @@
 from lex.config.InstanceConfig import InstanceConfig
+from langchain_ollama import OllamaEmbeddings
 from lex.core.Lex import Lex
 
-class DummyEmbedding:
-    def embed_documents(self, texts): return [[1.0]*3 for _ in texts]
-    def embed_query(self, text): return [1.0]*3
-
-def test_lex_sync_and_query(tmp_path):
-    storage_dir = tmp_path / "storage"
-    storage_dir.mkdir()
-    (storage_dir / "test.txt").write_text("Test content for Lex.")
-
-    config = (
-        InstanceConfig("test_lex")
-        .set_embbeding(DummyEmbedding())
-        .set_record_path(tmp_path / "record")
-        .set_storage_dir(storage_dir)
-        .set_vector_store_dir(tmp_path / "faiss")
-    )
-
-    lex = Lex(config)
-    lex.sync()
-
-    query_api = lex.vector_store_api()
-    results = query_api.invoke("test content")
-    assert len(results) > 0
-    lex.close()
-
-
+def get_ollama_embeddong():
+    return OllamaEmbeddings(model="qwen3-embedding:0.6b")
 
 
 if __name__ == "__main__":
-    dir = 'D:\\test\\'
-    test_lex_sync_and_query(dir)
+    lexi_conf = (InstanceConfig('my_app')
+                 .set_embbeding(get_ollama_embeddong())
+                 .set_vector_store_dir("D:\\Projects\\Personal\\LLM\\Lexi\\test\\persist")
+                 .set_storage_dir("D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage")
+                 .set_record_path("D:\\Projects\\Personal\\LLM\\Lexi\\test\\record")
+                 .set_chunking_strategy(InstanceConfig.CHUNK_MECHANISM.SEMANTIC_CHUNK)
+                 .set_mode({'mode':InstanceConfig.MODES.LEX_NANO,'response_mode':InstanceConfig.RESPONSE_MODES.FAST}))
+    lexi = Lex(lexi_conf).start()
+    print(lexi.is_running)
+    query_api = lexi.vector_store_api()
+    results = query_api.invoke("what is machine learning")
+    for res in results:
+        print(res)
+        print("=============="*10,end='\n\n')
+    lexi.close()
+    print(lexi.is_running)
+

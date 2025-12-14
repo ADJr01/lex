@@ -1,0 +1,3 @@
+Statistic: Beyond simple data collection, this is the mathematical backbone of modern AI.
+    It involves inferential logic (using samples to guess population behavior), probability theory,
+    and hypothesis testing to distinguish between random noise and significant signal in datasets.

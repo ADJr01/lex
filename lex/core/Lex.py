@@ -46,9 +46,7 @@ class Lex:
 
         print(f"[Lex] Initialized instance '{config.instance_name}' successfully.")
 
-    # =====================================================
-    # Lifecycle Management
-    # =====================================================
+    # Lifecycle Methods
 
     def start(self, watch: bool = False):
         """
@@ -63,6 +61,7 @@ class Lex:
             self.watcher.start()
             self.is_running = True
             print("[Lex] Live watcher enabled.")
+        return self
 
     def sync(self):
         """

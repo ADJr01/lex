@@ -1,0 +1,3 @@
+NLP: The convergence of linguistics and deep learning. It moves beyond simple keyword matching (Regex)
+    to understanding semantic meaning, context, sentiment, and syntax, allowing computers to parse
+    unstructured text data and translate it into mathematical vectors.
