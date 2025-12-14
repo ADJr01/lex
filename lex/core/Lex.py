@@ -110,11 +110,12 @@ class Lex:
             return
 
         vectors = [ec["vector"] for ec in embedded_chunks]
+
+        # 🔧 FIX: include the text as part of metadata
         metadata_list = []
         for ec in embedded_chunks:
-            print("CUSTOM LOG: ",ec)
             meta = ec["meta"].copy()
-            meta["page_content"] = ec.get("text", "")
+            meta["page_content"] = ec.get("text", "")  # carry text forward
             metadata_list.append(meta)
 
         vector_ids = self.vector_store.add_vectors(vectors, metadata_list)
