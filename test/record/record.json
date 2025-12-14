@@ -1,0 +1,127 @@
+{
+    "files": {
+        "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt": {
+            "status": "synced",
+            "hash": "22d9b64093b85d714dd5226c7d70370f6b1e46292bbbadf229297ef1ee1bb034",
+            "last_modified": 1764160585,
+            "vector_ids": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12
+            ],
+            "meta": {}
+        },
+        "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\langchain.txt": {
+            "status": "synced",
+            "hash": "82c0aa1408360e10b8f096200eabf3e85daaf26c6ff648a9650393ab84a4dc99",
+            "last_modified": 1763618023,
+            "vector_ids": [
+                13
+            ],
+            "meta": {}
+        },
+        "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\llm.txt": {
+            "status": "synced",
+            "hash": "e6993b5e867579bbf3cb71e77de4b7e58403997c546eeee3c05f913f7d62ff02",
+            "last_modified": 1764139052,
+            "vector_ids": [
+                14
+            ],
+            "meta": {}
+        },
+        "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt": {
+            "status": "synced",
+            "hash": "fbb8707dbb2dd4ac96dfd7508d8abf7ebb33b4ba1fd337fb7adb62f9e94a0fdc",
+            "last_modified": 1764160655,
+            "vector_ids": [
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42,
+                43,
+                44
+            ],
+            "meta": {}
+        },
+        "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\nlp.txt": {
+            "status": "synced",
+            "hash": "0c5ffd51c73fb9e7f8612d79a7ca6789f0b8c0318a1841304f15b1cfbd35fa82",
+            "last_modified": 1764139052,
+            "vector_ids": [
+                45
+            ],
+            "meta": {}
+        },
+        "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\panda.txt": {
+            "status": "synced",
+            "hash": "230bf65261e976e24ad03d747aa9b4330fe7a0f5c156ab09bbacfa029418d79a",
+            "last_modified": 1763618023,
+            "vector_ids": [
+                46
+            ],
+            "meta": {}
+        },
+        "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\statistics.txt": {
+            "status": "synced",
+            "hash": "ec4328cb4f6a2dc32cba2b636fcf03d74706b50b0051a6f98069356a08a0ee60",
+            "last_modified": 1764138929,
+            "vector_ids": [
+                47
+            ],
+            "meta": {}
+        },
+        "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\transformer.txt": {
+            "status": "synced",
+            "hash": "1bed283db0688870e3f01afdf49e71c847c1590aa778187407ccafcb81edda69",
+            "last_modified": 1764139052,
+            "vector_ids": [
+                48
+            ],
+            "meta": {}
+        },
+        "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\user.txt": {
+            "status": "synced",
+            "hash": "2d37991f21b9ad31ad214e1d464ec90e3c7e869e5e0dd0a71af46e8a9560ee96",
+            "last_modified": 1764180065,
+            "vector_ids": [
+                49
+            ],
+            "meta": {}
+        }
+    },
+    "last_sync": 1765739786
+}

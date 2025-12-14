@@ -1,0 +1,302 @@
+{
+    "0": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 0,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369118"
+    },
+    "1": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 1,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369127"
+    },
+    "2": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 2,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369131"
+    },
+    "3": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 3,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369134"
+    },
+    "4": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 4,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369139"
+    },
+    "5": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 5,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369141"
+    },
+    "6": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 6,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369144"
+    },
+    "7": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 7,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369146"
+    },
+    "8": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 8,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369149"
+    },
+    "9": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 9,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369151"
+    },
+    "10": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 10,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369154"
+    },
+    "11": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 11,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369157"
+    },
+    "12": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ds.txt",
+        "chunk_index": 12,
+        "total_chunks": 13,
+        "inserted_at": "2025-12-14T18:37:20.369159"
+    },
+    "13": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\langchain.txt",
+        "chunk_index": 0,
+        "total_chunks": 1,
+        "inserted_at": "2025-12-14T18:37:20.449801"
+    },
+    "14": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\llm.txt",
+        "chunk_index": 0,
+        "total_chunks": 1,
+        "inserted_at": "2025-12-14T18:37:20.532154"
+    },
+    "15": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 0,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274621"
+    },
+    "16": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 1,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274629"
+    },
+    "17": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 2,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274632"
+    },
+    "18": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 3,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274635"
+    },
+    "19": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 4,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274638"
+    },
+    "20": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 5,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274640"
+    },
+    "21": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 6,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274643"
+    },
+    "22": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 7,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274646"
+    },
+    "23": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 8,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274649"
+    },
+    "24": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 9,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274652"
+    },
+    "25": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 10,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274654"
+    },
+    "26": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 11,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274657"
+    },
+    "27": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 12,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274659"
+    },
+    "28": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 13,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274662"
+    },
+    "29": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 14,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274664"
+    },
+    "30": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 15,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274667"
+    },
+    "31": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 16,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274669"
+    },
+    "32": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 17,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274672"
+    },
+    "33": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 18,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274674"
+    },
+    "34": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 19,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274676"
+    },
+    "35": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 20,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274679"
+    },
+    "36": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 21,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274681"
+    },
+    "37": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 22,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274684"
+    },
+    "38": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 23,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274686"
+    },
+    "39": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 24,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274689"
+    },
+    "40": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 25,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274691"
+    },
+    "41": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 26,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274693"
+    },
+    "42": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 27,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274696"
+    },
+    "43": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 28,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274699"
+    },
+    "44": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\ml.txt",
+        "chunk_index": 29,
+        "total_chunks": 30,
+        "inserted_at": "2025-12-14T18:37:21.274701"
+    },
+    "45": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\nlp.txt",
+        "chunk_index": 0,
+        "total_chunks": 1,
+        "inserted_at": "2025-12-14T18:37:21.357663"
+    },
+    "46": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\panda.txt",
+        "chunk_index": 0,
+        "total_chunks": 1,
+        "inserted_at": "2025-12-14T18:37:21.438227"
+    },
+    "47": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\statistics.txt",
+        "chunk_index": 0,
+        "total_chunks": 1,
+        "inserted_at": "2025-12-14T18:37:21.522726"
+    },
+    "48": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\transformer.txt",
+        "chunk_index": 0,
+        "total_chunks": 1,
+        "inserted_at": "2025-12-14T18:37:21.606435"
+    },
+    "49": {
+        "source": "D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage\\user.txt",
+        "chunk_index": 0,
+        "total_chunks": 1,
+        "inserted_at": "2025-12-14T18:37:21.687350"
+    }
+}

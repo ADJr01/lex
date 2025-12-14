@@ -110,7 +110,12 @@ class Lex:
             return
 
         vectors = [ec["vector"] for ec in embedded_chunks]
-        metadata_list = [ec["meta"] for ec in embedded_chunks]
+        metadata_list = []
+        for ec in embedded_chunks:
+            print("CUSTOM LOG: ",ec)
+            meta = ec["meta"].copy()
+            meta["page_content"] = ec.get("text", "")
+            metadata_list.append(meta)
 
         vector_ids = self.vector_store.add_vectors(vectors, metadata_list)
         self.record_manager.mark_synced(file_path, vector_ids)

@@ -119,6 +119,8 @@ class VectorStore:
                 **metadata_list[i],
                 "inserted_at": datetime.utcnow().isoformat()
             }
+            if "text" in metadata_list[i]:
+                meta["page_content"] = metadata_list[i]["text"]
             self.metadata[str(mid)] = meta
 
         self._save()
@@ -167,7 +169,10 @@ class VectorStore:
                 continue
             if filter and not all(meta.get(k) == v for k, v in filter.items()):
                 continue
-            entry = {"meta": meta}
+            entry = {
+                "meta": meta,
+                "page_content": meta.get("page_content", None)
+            }
             if with_score:
                 entry["score"] = float(distances[0][i])
             results.append(entry)

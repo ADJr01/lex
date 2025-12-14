@@ -66,16 +66,15 @@ class QueryService:
         print(f"[QueryService] Unknown mode: {self.response_mode}")
         return []
 
-    # =====================================================
+
     # Deep Query Logic
-    # =====================================================
 
     def _deep_query(self, query, q_vector, filter, top_k, with_score):
         """
         Perform deeper, multi-pass query with query expansion and re-ranking.
         """
         print("[QueryService] Starting DEEP query mode...")
-
+        start_time = time.time()
         # Step 1: Initial retrieval
         primary_results = self.vector_store.query(q_vector, top_k=top_k * 2, filter=filter, with_score=True)
 
