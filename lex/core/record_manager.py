@@ -38,7 +38,6 @@ class RecordManager:
                 json.dump(self.data, f, indent=4)
 
     def _atomic_write(self):
-        """Safely write to record.json atomically."""
         temp_file = self.record_file.with_suffix(".tmp")
         with open(temp_file, "w", encoding="utf-8") as f:
             json.dump(self.data, f, indent=4)

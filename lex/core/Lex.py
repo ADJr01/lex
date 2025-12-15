@@ -11,6 +11,8 @@ Orchestrates the entire Chrono Engine:
 """
 
 import os
+
+from lex.config.InstanceConfig import InstanceConfig
 from lex.core.record_manager import RecordManager
 from lex.core.chrono_watcher import ChronoWatcher
 from lex.core.chunker import Chunker
@@ -22,7 +24,7 @@ from lex.core.query_service import QueryService
 class Lex:
     """Main entry point for the Lexi Chrono Engine."""
 
-    def __init__(self, config):
+    def __init__(self, config:InstanceConfig):
         self.config = config
         self.config.validate()
         self.record_manager = RecordManager(config.record_path)
