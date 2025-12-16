@@ -93,6 +93,8 @@ class Chunker:
     def _load_file(self, file_path: str) -> str:
         """Auto-select appropriate loader based on extension."""
         ext = os.path.splitext(file_path)[1].lower()
+        if ext not in self.SUPPORTED_EXTENSIONS:
+            return ''
 
         self.parser.select_file(file_path)
         docs = self.parser.process_document()

@@ -41,7 +41,7 @@ unstructured[xlsx]>=0.12.4
 pypdf>=4.0.0
 python-docx>=1.1.0
 openpyxl>=3.1.2
-
+docx2txt
 # -------------------------------
 # JSON / SQL / Data Handling
 # -------------------------------

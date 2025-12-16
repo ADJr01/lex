@@ -13,16 +13,18 @@ if __name__ == "__main__":
                  .set_storage_dir("D:\\Projects\\Personal\\LLM\\Lexi\\test\\storage")
                  .set_record_path("D:\\Projects\\Personal\\LLM\\Lexi\\test\\record")
                  .set_chunking_strategy(InstanceConfig.CHUNK_MECHANISM.SEMANTIC_CHUNK)
+                 .set_similarity_metric('cosine')
                  .set_mode({'mode':InstanceConfig.MODES.LEX_NANO,'response_mode':InstanceConfig.RESPONSE_MODES.DEEP}))
     lexi = Lex(lexi_conf).start()
     print(lexi.is_running)
     query_api = lexi.vector_store_api()
-    results = query_api.invoke("what is Texturing?",top_k=15)
+    results = query_api.invoke("What is Zero Code Cheque Printing?",top_k=5)
     print('\n\n\n\n')
     for res in results:
-        if res['score'] > 0.93:
-            print(f"score[{res['score']}]\n{res['page_content']}")
-            print("==============" * 10, end='\n\n')
+        if res['score']>0.6:
+            print(res['page_content'])
+            print("*"*100)
+
     lexi.close()
     print(lexi.is_running)
 

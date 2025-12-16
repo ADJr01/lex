@@ -33,9 +33,10 @@ class Lex:
         test_vec = self.embedder.embed_query("dimension check")
         embedding_dim = len(test_vec) if test_vec else 1536
         self.vector_store = VectorStore(
-            config.vector_store_dir,
+            store_dir=config.vector_store_dir,
             mode=config.mode["mode"],
-            embedding_dim=embedding_dim
+            embedding_dim=embedding_dim,
+            similarity_metric=config.similarity_metric
         )
         self.query_service = QueryService(
             self.vector_store,

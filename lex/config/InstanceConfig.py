@@ -31,6 +31,7 @@ class InstanceConfig:
         self.record_path = None
         self.storage_dir = None
         self.vector_store_dir = None
+        self.similarity_metric = 'cosine'
         self.chunking_strategy = self.CHUNK_MECHANISM.SEMANTIC_CHUNK
         self.mode = {
             "mode": self.MODES.LEX_NANO,
@@ -50,6 +51,12 @@ class InstanceConfig:
         """Set path for record.json and related metadata."""
         self.record_path = str(Path(path).resolve())
         os.makedirs(self.record_path, exist_ok=True)
+        return self
+
+    def set_similarity_metric(self, metric: str):
+        """Set similarity metric."""
+        if metric in ['l2','cosine']:
+            self.similarity_metric = metric
         return self
 
     def set_storage_dir(self, path: str):
