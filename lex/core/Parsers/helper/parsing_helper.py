@@ -42,7 +42,7 @@ WHITESPACE_PATTERN = re.compile(r"[ \t]+")
 NEWLINE_PATTERN = re.compile(r"\n{3,}")
 
 
-def clean_pdf_text(text: str) -> str:
+def clean_text(text: str) -> str:
     """
     Clean and normalize text extracted from PDF files.
 

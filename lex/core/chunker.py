@@ -12,11 +12,8 @@ import re
 from pathlib import Path
 from typing import List, Dict, Optional, Any
 import csv
-from langchain_text_splitters import (
-    RecursiveCharacterTextSplitter,
-)
 
-from lex.core.Parsers.pdf_parser import PDFParser
+from lex.core.Parsers.doc_paresr import DocParser
 
 # Conditional imports with helpful error messages
 try:
@@ -75,6 +72,8 @@ class Chunker:
         self.adaptive = adaptive
         self.chunk_cache = {}
         self._validate_dependencies()
+        self.parser = parser = DocParser(None,2000,200,100)
+
 
     def _validate_dependencies(self):
         """Check which loaders are available and warn about missing ones."""
@@ -137,33 +136,9 @@ class Chunker:
 
         try:
             # Select appropriate loader based on extension
-            if ext == ".pdf":
-                if not PDF_AVAILABLE:
-                    raise ImportError("PyPDFLoader not available. Install: pip install pypdf")
-                pdf_parser = PDFParser(file_path,)
-                docs = pdf_parser.process_pdf()
 
-            elif ext == ".docx":
-                if not DOCX_AVAILABLE:
-                    raise ImportError("Docx2txtLoader not available. Install: pip install docx2txt")
-                loader = Docx2txtLoader(file_path)
-                # FIXED: Load returns Document objects, extract page_content
-                docs = loader.load()
-
-            elif ext in [".xls", ".xlsx"]:
-                if not EXCEL_AVAILABLE:
-                    raise ImportError("UnstructuredExcelLoader not available. Install: pip install unstructured")
-                # FIXED: Added mode parameter for better Excel parsing
-                loader = UnstructuredExcelLoader(file_path, mode="elements")
-                # FIXED: Load returns Document objects, extract page_content
-                docs = loader.load()
-
-            else:
-                loader = TextLoader(file_path, encoding="utf-8")
-                # FIXED: Load returns Document objects, extract page_content
-                docs = loader.load()
-
-
+            self.parser.select_file(file_path)
+            docs = self.parser.process_document()
 
             if not docs:
                 print(f"[Chunker] Warning: No content extracted from {file_path}")
