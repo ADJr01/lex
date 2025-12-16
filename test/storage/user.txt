@@ -1,4 +1,0 @@
-user: Rahat Adnan
-age: 29
-occupation: Software Engineer
-Role: "boss"

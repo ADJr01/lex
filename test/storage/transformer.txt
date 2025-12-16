@@ -1,3 +1,0 @@
-Transformers: The architecture that killed the RNN (Recurrent Neural Network). Using a mechanism called
-    'Self-Attention', it allows a model to weigh the importance of different words in a sentence simultaneously
-    (parallel processing) rather than sequentially, enabling the understanding of long-range dependencies in text.

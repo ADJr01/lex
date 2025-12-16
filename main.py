@@ -17,11 +17,11 @@ if __name__ == "__main__":
     lexi = Lex(lexi_conf).start()
     print(lexi.is_running)
     query_api = lexi.vector_store_api()
-    results = query_api.invoke("what is machine learning",top_k=10)
+    results = query_api.invoke("what is Rendering Spectrum?",top_k=10)
     for res in results:
         if res['score'] > 0.9:
-            print(res['page_content'])
-            print("=============="*10,end='\n\n')
+            print(f"[{res['score']}]\n{res['page_content']}")
+            print("==============" * 10, end='\n\n')
     lexi.close()
     print(lexi.is_running)
 

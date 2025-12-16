@@ -1,3 +1,0 @@
-LLM: A probabilistic engine trained on the internet's corpus. It doesn't 'know' facts;
-    it predicts the statistical likelihood of the next token (word/part of word) in a sequence.
-    Its 'intelligence' is an emergent property of massive parameter counts (weights) and vast training data.
