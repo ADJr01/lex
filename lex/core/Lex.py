@@ -72,7 +72,7 @@ class Lex:
         """
         print("[Lex] Performing full manual sync...")
         self.watcher.scan_once()
-        all_files = self.record_manager.get_all_files()
+        all_files = self.record_manager.get_all_files().copy()
 
         for file_path, meta in all_files.items():
             status = meta.get("status")
@@ -84,7 +84,7 @@ class Lex:
                     self.vector_store.delete_vectors(ids)
                 self.record_manager.remove_entry(file_path)
 
-        print("[Lex] Manual sync complete.")
+        print("[Lex] sync complete.")
 
     def close(self):
         """Close all Lex components gracefully."""

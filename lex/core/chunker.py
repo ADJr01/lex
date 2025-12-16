@@ -3,7 +3,7 @@ Chunker
 =======
 
 Performs intelligent semantic chunking using LangChain-supported loaders and chunkers.
-Enhanced with adaptive strategies, context preservation, and smart boundary detection.
+Enhanced with proper error handling and dependency validation.
 """
 
 import os
@@ -11,17 +11,51 @@ import json
 import re
 from pathlib import Path
 from typing import List, Dict, Optional, Any
-from langchain_community.document_loaders import (
-    TextLoader,
-    PyPDFLoader,
-    Docx2txtLoader,
-    UnstructuredExcelLoader,
-)
+import csv
 from langchain_text_splitters import (
     RecursiveCharacterTextSplitter,
 )
-from semantic_chunker_langchain.chunker import SemanticChunker
-import csv
+
+from lex.core.Parsers.pdf_parser import PDFParser
+
+# Conditional imports with helpful error messages
+try:
+    from langchain_community.document_loaders import (
+        TextLoader,
+        PyMuPDFLoader,
+    )
+except ImportError:
+    raise ImportError("Please install: pip install langchain-community")
+
+try:
+    from langchain_community.document_loaders import PyPDFLoader
+    PDF_AVAILABLE = True
+except ImportError:
+    PDF_AVAILABLE = False
+    print("[Warning] PyPDFLoader unavailable. Install: pip install pypdf")
+
+try:
+    from langchain_community.document_loaders import Docx2txtLoader
+    DOCX_AVAILABLE = True
+except ImportError:
+    DOCX_AVAILABLE = False
+    print("[Warning] Docx2txtLoader unavailable. Install: pip install docx2txt")
+
+try:
+    from langchain_community.document_loaders import UnstructuredExcelLoader
+    EXCEL_AVAILABLE = True
+except ImportError:
+    EXCEL_AVAILABLE = False
+    print("[Warning] UnstructuredExcelLoader unavailable. Install: pip install unstructured")
+
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+try:
+    from semantic_chunker_langchain.chunker import SemanticChunker
+    SEMANTIC_AVAILABLE = True
+except ImportError:
+    SEMANTIC_AVAILABLE = False
+    print("[Warning] SemanticChunker unavailable. Install: pip install semantic-chunker-langchain")
 
 
 class Chunker:
@@ -40,9 +74,22 @@ class Chunker:
         self.strategy = strategy
         self.adaptive = adaptive
         self.chunk_cache = {}
+        self._validate_dependencies()
+
+    def _validate_dependencies(self):
+        """Check which loaders are available and warn about missing ones."""
+        status = {
+            "PDF": PDF_AVAILABLE,
+            "DOCX": DOCX_AVAILABLE,
+            "Excel": EXCEL_AVAILABLE,
+            "Semantic": SEMANTIC_AVAILABLE
+        }
+        missing = [k for k, v in status.items() if not v]
+        if missing:
+            print(f"[Chunker] Missing optional dependencies for: {', '.join(missing)}")
 
     # =====================================================
-    # File Loading Utilities
+    # File Loading Utilities (FIXED)
     # =====================================================
 
     def _load_text(self, file_path: str) -> str:
@@ -57,8 +104,7 @@ class Chunker:
                 with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
                     return f.read()
         except Exception as e:
-            print(f"[Chunker] Failed to load {file_path}: {e}")
-            return ""
+            raise IOError(f"Failed to load text file {file_path}: {e}")
 
     def _load_csv(self, file_path: str) -> str:
         """Convert CSV rows to text with enhanced structure preservation."""
@@ -79,30 +125,73 @@ class Chunker:
 
             return "\n".join(lines)
         except Exception as e:
-            print(f"[Chunker] Failed to load CSV {file_path}: {e}")
-            return ""
+            raise IOError(f"Failed to load CSV {file_path}: {e}")
 
     def _load_doc(self, file_path: str) -> str:
-        """Use LangChain document loaders for structured files."""
+        """
+        Use LangChain document loaders for structured files.
+
+        FIXED: Properly extracts page_content from Document objects
+        """
         ext = os.path.splitext(file_path)[1].lower()
+
         try:
+            # Select appropriate loader based on extension
             if ext == ".pdf":
-                loader = PyPDFLoader(file_path)
+                if not PDF_AVAILABLE:
+                    raise ImportError("PyPDFLoader not available. Install: pip install pypdf")
+                pdf_parser = PDFParser(file_path,)
+                docs = pdf_parser.process_pdf()
+
             elif ext == ".docx":
+                if not DOCX_AVAILABLE:
+                    raise ImportError("Docx2txtLoader not available. Install: pip install docx2txt")
                 loader = Docx2txtLoader(file_path)
+                # FIXED: Load returns Document objects, extract page_content
+                docs = loader.load()
+
             elif ext in [".xls", ".xlsx"]:
-                loader = UnstructuredExcelLoader(file_path)
+                if not EXCEL_AVAILABLE:
+                    raise ImportError("UnstructuredExcelLoader not available. Install: pip install unstructured")
+                # FIXED: Added mode parameter for better Excel parsing
+                loader = UnstructuredExcelLoader(file_path, mode="elements")
+                # FIXED: Load returns Document objects, extract page_content
+                docs = loader.load()
+
             else:
-                loader = TextLoader(file_path)
-            docs = loader.load()
-            return "\n".join([doc.page_content for doc in docs])
+                loader = TextLoader(file_path, encoding="utf-8")
+                # FIXED: Load returns Document objects, extract page_content
+                docs = loader.load()
+
+
+
+            if not docs:
+                print(f"[Chunker] Warning: No content extracted from {file_path}")
+                return ""
+
+            # Extract text from Document objects
+            text_content = []
+            for doc in docs:
+                # Document objects have page_content attribute
+                if hasattr(doc, 'page_content'):
+                    text_content.append(doc.page_content)
+                else:
+                    text_content.append(str(doc))
+
+            return "\n\n".join(text_content)
+
+        except ImportError as e:
+            raise e
         except Exception as e:
-            print(f"[Chunker] Failed to load document {file_path}: {e}")
-            return ""
+            raise IOError(f"Failed to load document {file_path}: {str(e)}")
 
     def _load_file(self, file_path: str) -> str:
         """Auto-select appropriate loader based on extension."""
         ext = os.path.splitext(file_path)[1].lower()
+
+        if ext not in self.SUPPORTED_EXTENSIONS:
+            raise ValueError(f"Unsupported file type: {ext}. Supported: {self.SUPPORTED_EXTENSIONS}")
+
         if ext in [".txt", ".json"]:
             return self._load_text(file_path)
         elif ext == ".csv":
@@ -119,7 +208,7 @@ class Chunker:
         Analyze text structure to determine optimal chunking strategy.
 
         Returns:
-            Dict with structure metadata (has_code, has_lists, has_headers, etc.)
+            Dict with structure metadata
         """
         analysis = {
             "has_code": bool(re.search(r'```|class |def |function |import |require\(', text)),
@@ -134,9 +223,7 @@ class Chunker:
         return analysis
 
     def _smart_preprocess(self, text: str, analysis: Dict[str, Any]) -> str:
-        """
-        Intelligently preprocess text based on structure analysis.
-        """
+        """Intelligently preprocess text based on structure analysis."""
         # Preserve code blocks
         if analysis["has_code"]:
             text = self._mark_code_boundaries(text)
@@ -157,7 +244,6 @@ class Chunker:
 
     def _enhance_list_markers(self, text: str) -> str:
         """Enhance list item detection for better chunk boundaries."""
-        # Add subtle markers before list items
         text = re.sub(r'^(\s*[-*•]\s+)', r'[LIST_ITEM]\1', text, flags=re.MULTILINE)
         return text
 
@@ -166,81 +252,66 @@ class Chunker:
     # =====================================================
 
     def _get_adaptive_chunk_size(self, analysis: Dict[str, Any]) -> int:
-        """
-        Determine optimal chunk size based on content analysis.
-        """
+        """Determine optimal chunk size based on content analysis."""
         base_size = 1000
 
-        # Adjust based on structure
         if analysis["has_code"]:
-            base_size = 1500  # Code needs more context
+            base_size = 1500
         elif analysis["has_tables"]:
-            base_size = 800   # Tables should stay together
+            base_size = 800
         elif analysis["avg_line_length"] > 100:
-            base_size = 1200  # Long lines suggest technical content
+            base_size = 1200
         elif analysis["paragraph_count"] < 5:
-            base_size = 2000  # Few paragraphs = keep together
+            base_size = 2000
 
         return base_size
 
     def _create_smart_splitter(self, text: str, embedding_model=None) -> Any:
-        """
-        Create an intelligent text splitter based on content analysis.
-        """
+        """Create an intelligent text splitter based on content analysis."""
         analysis = self._analyze_content_structure(text)
         chunk_size = self._get_adaptive_chunk_size(analysis)
 
-        # Define smart separators based on content type
         separators = [
-            "\n[CODE_BLOCK_END]\n",  # Don't split code blocks
-            "\n\n\n",                 # Major section breaks
-            "\n\n",                   # Paragraph breaks
-            "\n[LIST_ITEM]",          # List boundaries
-            "\n",                     # Line breaks
-            ". ",                     # Sentence boundaries
-            " ",                      # Word boundaries
-            "",                       # Character level (last resort)
+            "\n[CODE_BLOCK_END]\n",
+            "\n\n\n",
+            "\n\n",
+            "\n[LIST_ITEM]",
+            "\n",
+            ". ",
+            " ",
+            "",
         ]
 
-        if self.strategy == "SEMANTIC_CHUNK" and embedding_model:
+        if self.strategy == "SEMANTIC_CHUNK" and embedding_model and SEMANTIC_AVAILABLE:
             try:
                 return SemanticChunker(embedding_model)
             except Exception as e:
                 print(f"[Chunker] Semantic chunker failed, using hybrid: {e}")
 
-        # Enhanced RecursiveCharacterTextSplitter with adaptive settings
         return RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
-            chunk_overlap=min(200, int(chunk_size * 0.15)),  # 15% overlap
+            chunk_overlap=min(200, int(chunk_size * 0.15)),
             separators=separators,
             length_function=len,
             is_separator_regex=False,
         )
 
     def _post_process_chunks(self, chunks: List[str], analysis: Dict[str, Any]) -> List[str]:
-        """
-        Post-process chunks to clean up markers and ensure quality.
-        """
+        """Post-process chunks to clean up markers and ensure quality."""
         processed = []
         for chunk in chunks:
-            # Remove processing markers
             chunk = chunk.replace('[CODE_BLOCK_START]', '')
             chunk = chunk.replace('[CODE_BLOCK_END]', '')
             chunk = chunk.replace('[LIST_ITEM]', '')
-
-            # Trim excessive whitespace
             chunk = chunk.strip()
 
-            # Skip empty chunks
             if chunk:
                 processed.append(chunk)
 
         return processed
 
     def _merge_small_chunks(self, chunks: List[str], min_size: int = 100) -> List[str]:
-        """
-        Intelligently merge chunks that are too small.
-        """
+        """Intelligently merge chunks that are too small."""
         if not chunks:
             return chunks
 
@@ -258,9 +329,7 @@ class Chunker:
         return merged
 
     def _add_context_overlap(self, chunks: List[str], overlap_sentences: int = 2) -> List[str]:
-        """
-        Add contextual overlap between chunks for better retrieval.
-        """
+        """Add contextual overlap between chunks for better retrieval."""
         if len(chunks) <= 1:
             return chunks
 
@@ -270,7 +339,6 @@ class Chunker:
             prev_chunk = chunks[i-1]
             current_chunk = chunks[i]
 
-            # Extract last sentences from previous chunk
             sentences = re.split(r'(?<=[.!?])\s+', prev_chunk)
             overlap = ' '.join(sentences[-overlap_sentences:]) if len(sentences) > overlap_sentences else ''
 
@@ -300,12 +368,17 @@ class Chunker:
             List[dict]: [{"text": str, "meta": {...}}]
         """
         if not os.path.exists(file_path):
-            print(f"[Chunker] File not found: {file_path}")
-            return []
+            raise FileNotFoundError(f"File not found: {file_path}")
 
-        text = self._load_file(file_path)
+        # Load file content
+        try:
+            text = self._load_file(file_path)
+        except Exception as e:
+            print(f"[Chunker] Error loading {file_path}: {e}")
+            raise
+
         if not text.strip():
-            print(f"[Chunker] Empty or unreadable file: {file_path}")
+            print(f"[Chunker] Warning: Empty or unreadable file: {file_path}")
             return []
 
         # Analyze content structure
@@ -322,17 +395,13 @@ class Chunker:
 
             # Post-process chunks
             chunks = self._post_process_chunks(chunks, analysis)
-
-            # Merge very small chunks
             chunks = self._merge_small_chunks(chunks)
 
-            # Add contextual overlap if requested
             if add_overlap_context and len(chunks) > 1:
                 chunks = self._add_context_overlap(chunks)
 
         except Exception as e:
             print(f"[Chunker] Chunking failed for {file_path}: {e}")
-            # Fallback to single chunk
             chunks = [text]
 
         # Build result with enhanced metadata
@@ -352,18 +421,22 @@ class Chunker:
                 },
             })
 
-        print(f"[Chunker] Chunked {file_path} → {len(result)} chunks (strategy: {self.strategy}, adaptive: {self.adaptive})")
+        print(f"[Chunker] ✅ Chunked {file_path} → {len(result)} chunks (strategy: {self.strategy})")
         return result
 
     def chunk_multiple_files(self, file_paths: List[str],
                            embedding_model=None) -> Dict[str, List[Dict[str, Any]]]:
         """
-        Chunk multiple files efficiently with caching.
+        Chunk multiple files efficiently.
 
         Returns:
             Dict mapping file paths to their chunks
         """
         results = {}
         for file_path in file_paths:
-            results[file_path] = self.chunk_file(file_path, embedding_model)
+            try:
+                results[file_path] = self.chunk_file(file_path, embedding_model)
+            except Exception as e:
+                print(f"[Chunker] ❌ Skipping {file_path}: {e}")
+                results[file_path] = []
         return results

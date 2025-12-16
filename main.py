@@ -17,11 +17,12 @@ if __name__ == "__main__":
     lexi = Lex(lexi_conf).start()
     print(lexi.is_running)
     query_api = lexi.vector_store_api()
-    results = query_api.invoke("what is Rendering Spectrum?",top_k=10)
+    results = query_api.invoke("what is Rendering Spectrum?",top_k=15)
     for res in results:
-        if res['score'] > 0.9:
-            print(f"[{res['score']}]\n{res['page_content']}")
+        if res['score'] > 0.65:
+            print(f"score[{res['score']}]\n{res}")
             print("==============" * 10, end='\n\n')
+            break
     lexi.close()
     print(lexi.is_running)
 
