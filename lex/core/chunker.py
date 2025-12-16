@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import List, Dict, Optional, Any
 
 from lex.core.Parsers.doc_paresr import DocParser
+from lex.util.Contants import EXTENSION_SUPPORTED_CONSTANT
 
 # Conditional imports with helpful error messages
 try:
@@ -56,7 +57,7 @@ except ImportError:
 class Chunker:
     """Handles intelligent file chunking for supported formats using LangChain."""
 
-    SUPPORTED_EXTENSIONS = [".txt", ".json", ".pdf", ".csv", ".docx", ".xls", ".xlsx"]
+    SUPPORTED_EXTENSIONS = EXTENSION_SUPPORTED_CONSTANT
 
     def __init__(self, strategy="SEMANTIC_CHUNK", adaptive=True):
         """

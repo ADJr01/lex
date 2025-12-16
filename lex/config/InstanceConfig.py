@@ -8,6 +8,7 @@ Handles embedding, storage paths, mode selection, and sync strategy.
 
 import os
 from pathlib import Path
+from lex.util.Contants import INVALID_INSTANCE_NAME_CONSTANT, SUPPORTED_METRIC_CONSTANT
 from lex.util.Errors import InvalidArgumentError
 
 class InstanceConfig:
@@ -26,8 +27,8 @@ class InstanceConfig:
         HYBRID = "HYBRID"                  # Semantic + token fallback
 
     def __init__(self, instance_name: str):
-        if instance_name.lower() is 'lex' or instance_name.lower() is 'lex_nano' or instance_name.lower() is 'lex_lds' or instance_name.lower() is 'lex_core':
-            raise InvalidArgumentError("LEX/LEX_CORE/LEX_NANO/LEX_LDS names cannot be used as instance name")
+        if instance_name.lower() in INVALID_INSTANCE_NAME_CONSTANT:
+            raise InvalidArgumentError(f"{"/".join(INVALID_INSTANCE_NAME_CONSTANT)} names cannot be used as instance name")
         self.instance_name = instance_name
         self.embedding = None
         self.record_path = None
@@ -57,7 +58,7 @@ class InstanceConfig:
 
     def set_similarity_metric(self, metric: str):
         """Set similarity metric."""
-        if metric in ['l2','cosine']:
+        if metric in SUPPORTED_METRIC_CONSTANT:
             self.similarity_metric = metric
             return self
         raise InvalidArgumentError(f"Invalid similarity metric: {metric}. Must be 'l2' or 'cosine'")
