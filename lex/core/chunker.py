@@ -7,11 +7,9 @@ Enhanced with proper error handling and dependency validation.
 """
 
 import os
-import json
 import re
 from pathlib import Path
 from typing import List, Dict, Optional, Any
-import csv
 
 from lex.core.Parsers.doc_paresr import DocParser
 
@@ -91,88 +89,23 @@ class Chunker:
     # File Loading Utilities (FIXED)
     # =====================================================
 
-    def _load_text(self, file_path: str) -> str:
-        """Read plain text or JSON file."""
-        ext = os.path.splitext(file_path)[1].lower()
-        try:
-            if ext == ".json":
-                with open(file_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                return json.dumps(data, indent=2)
-            else:
-                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                    return f.read()
-        except Exception as e:
-            raise IOError(f"Failed to load text file {file_path}: {e}")
-
-    def _load_csv(self, file_path: str) -> str:
-        """Convert CSV rows to text with enhanced structure preservation."""
-        try:
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                reader = csv.reader(f)
-                rows = list(reader)
-                if not rows:
-                    return ""
-
-                # Preserve header context
-                header = rows[0] if rows else []
-                lines = [" | ".join(header)]
-                lines.append("-" * 50)  # Separator for clarity
-
-                for row in rows[1:]:
-                    lines.append(" | ".join(row))
-
-            return "\n".join(lines)
-        except Exception as e:
-            raise IOError(f"Failed to load CSV {file_path}: {e}")
-
-    def _load_doc(self, file_path: str) -> str:
-        """
-        Use LangChain document loaders for structured files.
-
-        FIXED: Properly extracts page_content from Document objects
-        """
-        ext = os.path.splitext(file_path)[1].lower()
-
-        try:
-            # Select appropriate loader based on extension
-
-            self.parser.select_file(file_path)
-            docs = self.parser.process_document()
-
-            if not docs:
-                print(f"[Chunker] Warning: No content extracted from {file_path}")
-                return ""
-
-            # Extract text from Document objects
-            text_content = []
-            for doc in docs:
-                # Document objects have page_content attribute
-                if hasattr(doc, 'page_content'):
-                    text_content.append(doc.page_content)
-                else:
-                    text_content.append(str(doc))
-
-            return "\n\n".join(text_content)
-
-        except ImportError as e:
-            raise e
-        except Exception as e:
-            raise IOError(f"Failed to load document {file_path}: {str(e)}")
 
     def _load_file(self, file_path: str) -> str:
         """Auto-select appropriate loader based on extension."""
         ext = os.path.splitext(file_path)[1].lower()
 
-        if ext not in self.SUPPORTED_EXTENSIONS:
-            raise ValueError(f"Unsupported file type: {ext}. Supported: {self.SUPPORTED_EXTENSIONS}")
+        self.parser.select_file(file_path)
+        docs = self.parser.process_document()
 
-        if ext in [".txt", ".json"]:
-            return self._load_text(file_path)
-        elif ext == ".csv":
-            return self._load_csv(file_path)
-        else:
-            return self._load_doc(file_path)
+        text_content = []
+        for doc in docs:
+            # Document objects have page_content attribute
+            if hasattr(doc, 'page_content'):
+                text_content.append(doc.page_content)
+            else:
+                text_content.append(str(doc))
+
+        return "\n\n".join(text_content)
 
     # =====================================================
     # Content Analysis & Smart Preprocessing

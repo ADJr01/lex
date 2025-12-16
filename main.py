@@ -17,10 +17,10 @@ if __name__ == "__main__":
     lexi = Lex(lexi_conf).start()
     print(lexi.is_running)
     query_api = lexi.vector_store_api()
-    results = query_api.invoke("what is Rendering Spectrum?",top_k=15)
+    results = query_api.invoke("what is Texturing?",top_k=15)
     print('\n\n\n\n')
     for res in results:
-        if res['score'] > 0.75:
+        if res['score'] > 0.93:
             print(f"score[{res['score']}]\n{res['page_content']}")
             print("==============" * 10, end='\n\n')
     lexi.close()
