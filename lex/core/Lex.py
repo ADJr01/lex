@@ -36,7 +36,8 @@ class Lex:
             store_dir=config.vector_store_dir,
             mode=config.mode["mode"],
             embedding_dim=embedding_dim,
-            similarity_metric=config.similarity_metric
+            similarity_metric=config.similarity_metric,
+            instance_name=self.config.instance_name,
         )
         self.query_service = QueryService(
             self.vector_store,

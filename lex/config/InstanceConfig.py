@@ -8,7 +8,7 @@ Handles embedding, storage paths, mode selection, and sync strategy.
 
 import os
 from pathlib import Path
-
+from lex.util.Errors import InvalidArgumentError
 
 class InstanceConfig:
     """Handles configuration for a Lexi Chrono instance."""
@@ -26,6 +26,8 @@ class InstanceConfig:
         HYBRID = "HYBRID"                  # Semantic + token fallback
 
     def __init__(self, instance_name: str):
+        if instance_name.lower() is 'lex' or instance_name.lower() is 'lex_nano' or instance_name.lower() is 'lex_lds' or instance_name.lower() is 'lex_core':
+            raise InvalidArgumentError("LEX/LEX_CORE/LEX_NANO/LEX_LDS names cannot be used as instance name")
         self.instance_name = instance_name
         self.embedding = None
         self.record_path = None
@@ -57,7 +59,8 @@ class InstanceConfig:
         """Set similarity metric."""
         if metric in ['l2','cosine']:
             self.similarity_metric = metric
-        return self
+            return self
+        raise InvalidArgumentError(f"Invalid similarity metric: {metric}. Must be 'l2' or 'cosine'")
 
     def set_storage_dir(self, path: str):
         """Set recursive storage directory for source files."""
@@ -75,7 +78,7 @@ class InstanceConfig:
         """Set chunking strategy (semantic or hybrid)."""
         valid = [self.CHUNK_MECHANISM.SEMANTIC_CHUNK, self.CHUNK_MECHANISM.HYBRID]
         if strategy not in valid:
-            raise ValueError(f"Invalid chunking strategy: {strategy}")
+            raise InvalidArgumentError(f"Invalid chunking strategy: {strategy}")
         self.chunking_strategy = strategy
         return self
 
@@ -85,9 +88,9 @@ class InstanceConfig:
         response_mode = mode_config.get("response_mode")
 
         if mode not in [self.MODES.LEX_NANO, self.MODES.LEX_LDS]:
-            raise ValueError("Invalid mode. Must be LEX_NANO or LEX_LDS.")
+            raise InvalidArgumentError("Invalid mode. Must be LEX_NANO or LEX_LDS.")
         if response_mode not in [self.RESPONSE_MODES.FAST, self.RESPONSE_MODES.DEEP]:
-            raise ValueError("Invalid response_mode. Must be FAST or DEEP.")
+            raise InvalidArgumentError("Invalid response_mode. Must be FAST or DEEP.")
 
         self.mode = {
             "mode": mode,

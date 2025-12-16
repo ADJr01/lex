@@ -22,7 +22,8 @@ class VectorStore:
         store_dir: str,
         mode: str,
         embedding_dim: int = 1536,
-        similarity_metric: str = "cosine"
+        similarity_metric: str = "cosine",
+        instance_name: Optional[str] = None,
     ):
         """
         Initialize VectorStore.
@@ -32,7 +33,9 @@ class VectorStore:
             mode (str): 'LEX_NANO' or 'LEX_LDS'
             embedding_dim (int): Dimension of embedding vectors
             similarity_metric (str): 'cosine' or 'l2' - distance metric to use
+            instance_name (str): name of the lex instance
         """
+        self.instance_name = instance_name if instance_name is not None else ""
         self.store_dir = Path(store_dir)
         self.mode = mode
         self.embedding_dim = embedding_dim
@@ -93,6 +96,7 @@ class VectorStore:
             # Save configuration on first creation
             with open(self.store_meta_path, "w", encoding="utf-8") as f:
                 json.dump({
+                    "instance":self.instance_name,
                     "mode": self.mode,
                     "similarity_metric": self.similarity_metric,
                     "embedding_dim": self.embedding_dim,
