@@ -13,11 +13,13 @@ from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+from lex.util.Contants import EXTENSION_SUPPORTED_CONSTANT
+
 
 class ChronoWatcher(FileSystemEventHandler):
     """Watches directories for changes and updates RecordManager."""
 
-    SUPPORTED_EXTENSIONS = [".txt", ".json", ".pdf", ".csv", ".docx", ".xls", ".xlsx"]
+    SUPPORTED_EXTENSIONS = EXTENSION_SUPPORTED_CONSTANT
 
     def __init__(self, storage_dir, record_manager, auto_start=False):
         """
