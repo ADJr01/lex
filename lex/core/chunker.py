@@ -46,12 +46,9 @@ except ImportError:
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-try:
-    from semantic_chunker_langchain.chunker import SemanticChunker
-    SEMANTIC_AVAILABLE = True
-except ImportError:
-    SEMANTIC_AVAILABLE = False
-    print("[Warning] SemanticChunker unavailable. Install: pip install semantic-chunker-langchain")
+from langchain_experimental.text_splitter import SemanticChunker
+SEMANTIC_AVAILABLE = True
+
 
 
 class Chunker:

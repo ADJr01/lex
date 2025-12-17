@@ -13,6 +13,7 @@ langchain>=0.1.16
 langchain-community>=0.0.34
 langchain-core>=0.1.43
 semantic-chunker-langchain
+langchain-experimental
 # -------------------------------
 # Embeddings Providers
 # (Choose what you need)

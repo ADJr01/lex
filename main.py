@@ -19,7 +19,7 @@ if __name__ == "__main__":
     lexi = Lex(lexi_conf).start()
     print(lexi.is_running)
     query_api = lexi.vector_store_api()
-    results = query_api.invoke("What is shadow in computer graphics?",top_k=5)
+    results = query_api.invoke("Will I receive software updates?",top_k=5)
     print('\n\n\n\n')
     for res in results:
         print(res['page_content'])
