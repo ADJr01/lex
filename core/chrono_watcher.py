@@ -13,7 +13,7 @@ from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-from lex.util.Contants import EXTENSION_SUPPORTED_CONSTANT
+from util.Contants import EXTENSION_SUPPORTED_CONSTANT
 
 
 class ChronoWatcher(FileSystemEventHandler):

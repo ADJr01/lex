@@ -1,10 +1,9 @@
-import os
 from typing import List, Optional
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyMuPDFLoader
 
-from lex.core.Parsers.helper.parsing_helper import (
+from core.Parsers.helper.parsing_helper import (
     clean_pdf_text,
     is_pdf_file
 )

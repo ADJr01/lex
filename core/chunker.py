@@ -9,10 +9,10 @@ Integrated with DocParser for better document parsing and cleaning.
 import os
 import re
 from pathlib import Path
-from typing import List, Dict, Optional, Any, Tuple
+from typing import List, Dict, Any, Tuple
 
-from lex.core.Parsers.doc_paresr import DocParser
-from lex.util.Contants import EXTENSION_SUPPORTED_CONSTANT
+from core.Parsers.doc_paresr import DocParser
+from util.Contants import EXTENSION_SUPPORTED_CONSTANT
 
 # Conditional imports with helpful error messages
 try:
