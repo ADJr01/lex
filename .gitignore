@@ -1,3 +1,4 @@
 .venv
-pyproject.toml
-uv.lock
+/pyproject.toml
+/uv.lock
+/__pycache__
