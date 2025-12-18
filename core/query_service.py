@@ -102,3 +102,11 @@ class QueryService:
         print(f"[QueryService] DEEP retrieval completed in {elapsed:.2f}s ({len(results)} results).")
 
         return results
+
+
+    # =====================================================
+    # GET AS RETRIEVER
+    # =====================================================
+
+    def store_as_retriever(self,k:int):
+        return  self.vector_store.get_as_retriever(k)
