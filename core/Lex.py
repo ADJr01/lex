@@ -10,13 +10,13 @@ Orchestrates the entire Chrono Engine:
 - Provides unified query interface
 """
 
-from config.InstanceConfig import InstanceConfig
-from core.record_manager import RecordManager
-from core.chrono_watcher import ChronoWatcher
-from core.chunker import Chunker
-from core.embedder import Embedder
-from core.vector_store import VectorStore
-from core.query_service import QueryService
+from lex.config.InstanceConfig import InstanceConfig
+from lex.core.record_manager import RecordManager
+from lex.core.chrono_watcher import ChronoWatcher
+from lex.core.chunker import Chunker
+from lex.core.embedder import Embedder
+from lex.core.vector_store import VectorStore
+from lex.core.query_service import QueryService
 
 
 class Lex:

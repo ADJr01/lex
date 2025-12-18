@@ -8,8 +8,8 @@ Handles embedding, storage paths, mode selection, and sync strategy.
 
 import os
 from pathlib import Path
-from util.Contants import INVALID_INSTANCE_NAME_CONSTANT, SUPPORTED_METRIC_CONSTANT
-from util.Errors import InvalidArgumentError
+from lex.util.Contants import INVALID_INSTANCE_NAME_CONSTANT, SUPPORTED_METRIC_CONSTANT
+from lex.util.Errors import InvalidArgumentError
 
 class InstanceConfig:
     """Handles configuration for a Lexi Chrono instance."""
