@@ -109,4 +109,4 @@ class QueryService:
     # =====================================================
 
     def store_as_retriever(self,k:int):
-        return  self.vector_store.get_as_retriever(k)
+        return  self.vector_store.get_as_retriever(k=k,embeddings_model=self.embedder)

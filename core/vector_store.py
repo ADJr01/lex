@@ -6,10 +6,6 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
 import logging
-from langchain_core.retrievers import BaseRetriever
-from langchain_core.documents import Document
-from langchain_core.callbacks import CallbackManagerForRetrieverRun
-from pydantic import Field
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -875,8 +871,11 @@ class VectorStore:
 
         logger.info(f"[VectorStore] Index rebuilt successfully with {new_similarity_metric} similarity.")
 
+    # =====================================================
+    # LangChain Integration
+    # =====================================================
 
-    def get_as_retriever(self, k: int = 4):
+    def get_as_retriever(self, k: int = 4, embeddings_model=None):
         """
         Get a LangChain-compatible retriever interface.
 
@@ -885,38 +884,56 @@ class VectorStore:
 
         Args:
             k: Number of documents to retrieve (default: 4)
+            embeddings_model: Optional embeddings model to convert text queries to vectors.
+                             If not provided, you must pass embeddings directly.
 
         Returns:
             VectorStoreRetriever: LangChain-compatible retriever
 
         Example:
             ```python
+            from langchain_community.embeddings import OllamaEmbeddings
+
             # Create vector store and add documents
             store = VectorStore("./faiss", "LEX_NANO", similarity_metric="cosine")
             store.add_vectors(embeddings, metadata_list)
 
-            # Get LangChain retriever
-            retriever = store.get_as_retriever(k=4)
+            # Get LangChain retriever with embeddings model
+            embeddings_model = OllamaEmbeddings(model="nomic-embed-text")
+            retriever = store.get_as_retriever(k=4, embeddings_model=embeddings_model)
 
-            # Use with LangChain
-            from langchain.chains import RetrievalQA
-            from langchain_openai import ChatOpenAI
+            # Use with LangChain RunnableMap
+            from langchain_core.runnables import RunnableMap
+            from langchain_core.prompts import ChatPromptTemplate
+            from langchain_community.chat_models import ChatOllama
 
-            qa_chain = RetrievalQA.from_chain_type(
-                llm=ChatOpenAI(),
-                retriever=retriever,
-                return_source_documents=True
+            prompt = ChatPromptTemplate.from_template(
+                "Context: {context}\\n\\nQuestion: {question}\\n\\nAnswer:"
             )
 
-            result = qa_chain({"query": "What is the main topic?"})
+            rag_chain = RunnableMap({
+                "context": retriever,  # Now handles text input!
+                "question": lambda x: x["question"]
+            }) | prompt | llm
+
+            result = rag_chain.invoke({"question": "What is machine learning?"})
             ```
         """
+        from langchain_core.retrievers import BaseRetriever
+        from langchain_core.documents import Document
+        from langchain_core.callbacks import CallbackManagerForRetrieverRun
+        from pydantic import Field
 
         class VectorStoreRetriever(BaseRetriever):
             """
             LangChain-compatible retriever wrapper for VectorStore.
+            Handles both text queries (with embeddings_model) and direct embeddings.
             """
             vector_store: Any = Field(description="The VectorStore instance")
+            embeddings_model: Any = Field(
+                default=None,
+                description="Embeddings model for text-to-vector conversion"
+            )
             k: int = Field(default=4, description="Number of documents to retrieve")
             score_threshold: Optional[float] = Field(
                 default=None,
@@ -937,22 +954,33 @@ class VectorStore:
                     run_manager: Optional[CallbackManagerForRetrieverRun] = None,
             ) -> List[Document]:
                 """
-                Get documents relevant to a query.
+                Get documents relevant to a query string.
+
+                This method works with RunnableMap and automatically embeds the query.
 
                 Args:
-                    query: Query string (will be embedded)
+                    query: Query string (will be embedded automatically if embeddings_model provided)
                     run_manager: Callback manager
 
                 Returns:
                     List of relevant Document objects
                 """
-                # This method expects the query to already be embedded
-                # In practice, you'll need to embed the query before calling this
-                # For now, we'll raise a helpful error
-                raise NotImplementedError(
-                    "Direct string queries not supported. Use get_relevant_documents_from_embedding() "
-                    "or embed your query first using your embedding model, then call: "
-                    "retriever.get_relevant_documents_from_embedding(query_embedding)"
+                if self.embeddings_model is None:
+                    raise ValueError(
+                        "embeddings_model must be provided to retrieve using text queries. "
+                        "Either:\n"
+                        "1. Pass embeddings_model when creating retriever: "
+                        "   store.get_as_retriever(k=4, embeddings_model=model)\n"
+                        "2. Or use get_relevant_documents_from_embedding() with pre-computed embeddings"
+                    )
+
+                # Embed the query text
+                query_embedding = self.embeddings_model.embed_query(query)
+
+                # Use the embedding to retrieve
+                return self.get_relevant_documents_from_embedding(
+                    query_embedding,
+                    run_manager=run_manager
                 )
 
             def get_relevant_documents_from_embedding(
@@ -996,35 +1024,53 @@ class VectorStore:
 
             def invoke(
                     self,
-                    query_embedding: List[float],
+                    input: Any,
                     config: Optional[Dict] = None,
             ) -> List[Document]:
                 """
-                Invoke the retriever with a query embedding.
+                Invoke the retriever with either a query string or embedding.
 
-                This is the main method used by LangChain chains.
+                This is the main method used by LangChain chains and RunnableMap.
 
                 Args:
-                    query_embedding: Pre-computed query embedding vector
+                    input: Either a query string or pre-computed embedding vector
                     config: Optional configuration
 
                 Returns:
                     List of relevant Document objects
                 """
-                return self.get_relevant_documents_from_embedding(query_embedding)
+                # Handle dict input (from RunnableMap)
+                if isinstance(input, dict):
+                    if "question" in input:
+                        input = input["question"]
+                    elif "query" in input:
+                        input = input["query"]
+                    else:
+                        # Assume first value is the query
+                        input = list(input.values())[0]
+
+                # Check if input is a string (text query) or list (embedding)
+                if isinstance(input, str):
+                    # Text query - embed it first
+                    return self._get_relevant_documents(input)
+                elif isinstance(input, (list, np.ndarray)):
+                    # Already an embedding
+                    return self.get_relevant_documents_from_embedding(input)
+                else:
+                    raise ValueError(
+                        f"Invalid input type: {type(input)}. "
+                        "Expected string (text query) or list/array (embedding)"
+                    )
 
         # Create and return the retriever
         retriever = VectorStoreRetriever(
             vector_store=self,
+            embeddings_model=embeddings_model,
             k=k
         )
 
         logger.info(f"[VectorStore] Created LangChain retriever with k={k}")
         return retriever
-
-
-
-
 
 
 
