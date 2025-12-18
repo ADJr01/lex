@@ -6,6 +6,10 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
 import logging
+from langchain_core.retrievers import BaseRetriever
+from langchain_core.documents import Document
+from langchain_core.callbacks import CallbackManagerForRetrieverRun
+from pydantic import Field
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -907,10 +911,6 @@ class VectorStore:
             result = qa_chain({"query": "What is the main topic?"})
             ```
         """
-        from langchain_core.retrievers import BaseRetriever
-        from langchain_core.documents import Document
-        from langchain_core.callbacks import CallbackManagerForRetrieverRun
-        from pydantic import Field
 
         class VectorStoreRetriever(BaseRetriever):
             """
