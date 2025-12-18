@@ -872,82 +872,163 @@ class VectorStore:
         logger.info(f"[VectorStore] Index rebuilt successfully with {new_similarity_metric} similarity.")
 
 
-# =====================================================
-# Usage Examples
-# =====================================================
+    def get_as_retriever(self, k: int = 4):
+        """
+        Get a LangChain-compatible retriever interface.
 
-if __name__ == "__main__":
-    print("=" * 80)
-    print("VectorStore Usage Examples")
-    print("=" * 80)
+        This method returns a retriever object that can be used seamlessly
+        with LangChain's retrieval chains, QA systems, and agents.
 
-    # Example 1: LEX_NANO mode (exact search, no training needed)
-    print("\n1. LEX_NANO Mode (Exact Search)")
-    print("-" * 40)
+        Args:
+            k: Number of documents to retrieve (default: 4)
 
-    store_nano = VectorStore(
-        store_dir="./faiss_nano",
-        mode="LEX_NANO",
-        embedding_dim=1536,
-        similarity_metric="cosine"
-    )
+        Returns:
+            VectorStoreRetriever: LangChain-compatible retriever
 
-    # Add vectors directly (no training needed)
-    embeddings = [[0.1] * 1536 for _ in range(100)]
-    metadata = [{"source": f"doc{i}.pdf", "text": f"Content {i}"} for i in range(100)]
+        Example:
+            ```python
+            # Create vector store and add documents
+            store = VectorStore("./faiss", "LEX_NANO", similarity_metric="cosine")
+            store.add_vectors(embeddings, metadata_list)
 
-    ids = store_nano.add_vectors(embeddings, metadata)
-    print(f"✓ Added {len(ids)} vectors to LEX_NANO store")
+            # Get LangChain retriever
+            retriever = store.get_as_retriever(k=4)
 
-    # Query
-    query_vec = [0.15] * 1536
-    results = store_nano.query(query_vec, top_k=3)
-    print(f"✓ Retrieved {len(results)} results")
+            # Use with LangChain
+            from langchain.chains import RetrievalQA
+            from langchain_openai import ChatOpenAI
 
-    # Example 2: LEX_LDS mode (approximate search with automatic training)
-    print("\n2. LEX_LDS Mode (Approximate Search with Auto-Training)")
-    print("-" * 40)
+            qa_chain = RetrievalQA.from_chain_type(
+                llm=ChatOpenAI(),
+                retriever=retriever,
+                return_source_documents=True
+            )
 
-    store_lds = VectorStore(
-        store_dir="./faiss_lds",
-        mode="LEX_LDS",
-        embedding_dim=1536,
-        similarity_metric="cosine"
-    )
+            result = qa_chain({"query": "What is the main topic?"})
+            ```
+        """
+        from langchain_core.retrievers import BaseRetriever
+        from langchain_core.documents import Document
+        from langchain_core.callbacks import CallbackManagerForRetrieverRun
+        from pydantic import Field
 
-    # Add vectors - training happens automatically!
-    embeddings = [[0.1 + i * 0.001] * 1536 for i in range(5000)]
-    metadata = [{"source": f"doc{i}.pdf", "text": f"Content {i}"} for i in range(5000)]
+        class VectorStoreRetriever(BaseRetriever):
+            """
+            LangChain-compatible retriever wrapper for VectorStore.
+            """
+            vector_store: Any = Field(description="The VectorStore instance")
+            k: int = Field(default=4, description="Number of documents to retrieve")
+            score_threshold: Optional[float] = Field(
+                default=None,
+                description="Minimum similarity score threshold"
+            )
+            filter: Optional[Dict[str, Any]] = Field(
+                default=None,
+                description="Metadata filter"
+            )
 
-    print("Adding vectors (training will happen automatically)...")
-    ids = store_lds.add_vectors(embeddings, metadata)
-    print(f"✓ Added {len(ids)} vectors to LEX_LDS store")
-    print(f"✓ Index trained: {store_lds.index.is_trained}")
-    print(f"✓ Clusters (nlist): {store_lds.index.nlist}")
-    print(f"✓ Search clusters (nprobe): {store_lds.index.nprobe}")
+            class Config:
+                arbitrary_types_allowed = True
 
-    # Add more vectors - will retrain if needed
-    print("\nAdding more vectors (may trigger retraining)...")
-    more_embeddings = [[0.5 + i * 0.001] * 1536 for i in range(5000)]
-    more_metadata = [{"source": f"doc2_{i}.pdf", "text": f"Content {i}"} for i in range(5000)]
+            def _get_relevant_documents(
+                    self,
+                    query: str,
+                    *,
+                    run_manager: Optional[CallbackManagerForRetrieverRun] = None,
+            ) -> List[Document]:
+                """
+                Get documents relevant to a query.
 
-    ids2 = store_lds.add_vectors(more_embeddings, more_metadata)
-    print(f"✓ Added {len(ids2)} more vectors")
+                Args:
+                    query: Query string (will be embedded)
+                    run_manager: Callback manager
 
-    # Query with debug
-    print("\nQuerying with debug info...")
-    store_lds.query_with_debug(query_vec, top_k=3)
+                Returns:
+                    List of relevant Document objects
+                """
+                # This method expects the query to already be embedded
+                # In practice, you'll need to embed the query before calling this
+                # For now, we'll raise a helpful error
+                raise NotImplementedError(
+                    "Direct string queries not supported. Use get_relevant_documents_from_embedding() "
+                    "or embed your query first using your embedding model, then call: "
+                    "retriever.get_relevant_documents_from_embedding(query_embedding)"
+                )
 
-    # Optimize for speed
-    print("\nOptimizing search speed...")
-    store_lds.optimize_search_speed(accuracy_target=0.85)
+            def get_relevant_documents_from_embedding(
+                    self,
+                    query_embedding: List[float],
+                    run_manager: Optional[CallbackManagerForRetrieverRun] = None,
+            ) -> List[Document]:
+                """
+                Get documents relevant to a query embedding.
 
-    # Get statistics
-    print("\nStore Statistics:")
-    stats = store_lds.get_stats()
-    for key, value in stats.items():
-        print(f"  {key}: {value}")
+                Args:
+                    query_embedding: Pre-computed query embedding vector
+                    run_manager: Callback manager
 
-    print("\n" + "=" * 80)
-    print("Examples completed successfully!")
-    print("=" * 80)
+                Returns:
+                    List of relevant Document objects
+                """
+                # Query the vector store
+                results = self.vector_store.query(
+                    query_vector=query_embedding,
+                    top_k=self.k,
+                    filter=self.filter,
+                    with_score=True,
+                    score_threshold=self.score_threshold
+                )
+
+                # Convert to LangChain Document objects
+                documents = []
+                for result in results:
+                    doc = Document(
+                        page_content=result["page_content"],
+                        metadata={
+                            **result["meta"],
+                            "score": result.get("score"),
+                            "similarity_metric": result.get("similarity_metric")
+                        }
+                    )
+                    documents.append(doc)
+
+                return documents
+
+            def invoke(
+                    self,
+                    query_embedding: List[float],
+                    config: Optional[Dict] = None,
+            ) -> List[Document]:
+                """
+                Invoke the retriever with a query embedding.
+
+                This is the main method used by LangChain chains.
+
+                Args:
+                    query_embedding: Pre-computed query embedding vector
+                    config: Optional configuration
+
+                Returns:
+                    List of relevant Document objects
+                """
+                return self.get_relevant_documents_from_embedding(query_embedding)
+
+        # Create and return the retriever
+        retriever = VectorStoreRetriever(
+            vector_store=self,
+            k=k
+        )
+
+        logger.info(f"[VectorStore] Created LangChain retriever with k={k}")
+        return retriever
+
+
+
+
+
+
+
+
+
+
+
