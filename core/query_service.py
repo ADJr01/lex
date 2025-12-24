@@ -69,7 +69,7 @@ class QueryService:
 
     # Deep Query Logic
 
-    def _deep_query(self, query, q_vector, filter, top_k, with_score):
+    def _deep_query(self, query, q_vector, filter, top_k=3, with_score=False):
         """
         Perform deeper, multi-pass query with query expansion and re-ranking.
         """
