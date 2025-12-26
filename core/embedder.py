@@ -59,7 +59,7 @@ class Embedder:
             print("[LEX::Embedder] No chunks to embed.")
             return []
 
-        print(f"[Embedder] Embedding {len(chunks)} chunks in batches of {self.batch_size}...")
+        print(f"[LEX::Embedder] Embedding {len(chunks)} chunks in batches of {self.batch_size}...")
 
         embedded = []
         for i in range(0, len(chunks), self.batch_size):
@@ -76,7 +76,7 @@ class Embedder:
                     "text": batch[j]["text"]
                 })
 
-        print(f"[Embedder] Completed embeddings for {len(embedded)} chunks.")
+        print(f"[LEX::Embedder] Completed embeddings for {len(embedded)} chunks.")
         return embedded
 
     def embed_query(self, query: str) -> List[float]:
