@@ -56,7 +56,7 @@ class Embedder:
             List[dict]: List of {"vector": [...], "meta": {...}}
         """
         if not chunks:
-            print("[Embedder] No chunks to embed.")
+            print("[LEX::Embedder] No chunks to embed.")
             return []
 
         print(f"[Embedder] Embedding {len(chunks)} chunks in batches of {self.batch_size}...")
