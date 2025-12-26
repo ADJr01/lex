@@ -20,7 +20,7 @@ from lex.core.query_service import QueryService
 
 
 class Lex:
-    """Main entry point for the Lexi Chrono Engine."""
+    """Main entry point for the Lex Engine."""
 
     def __init__(self, config:InstanceConfig):
         self.config = config
