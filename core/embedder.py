@@ -91,5 +91,5 @@ class Embedder:
         try:
             return self.embedding_model.embed_query(query)
         except Exception as e:
-            print(f"[Embedder] Query embedding failed: {e}")
+            print(f"[LEX::Embedder] Query embedding failed: {e}")
             return []
